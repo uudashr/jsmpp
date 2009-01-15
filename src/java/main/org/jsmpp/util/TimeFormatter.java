@@ -42,4 +42,5 @@ public interface TimeFormatter {
      * @return the formatted date or <code>null</code> if the <code>date</code> is <code>null</code>.
      */
     String format(Date date);
+    
 }

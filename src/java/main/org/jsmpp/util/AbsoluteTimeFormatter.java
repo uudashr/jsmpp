@@ -17,6 +17,7 @@ package org.jsmpp.util;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 
 /**
@@ -71,10 +72,51 @@ public class AbsoluteTimeFormatter implements TimeFormatter {
         return format(cal);
     }
     
+    public Date toDate(String formattedDate) {
+        
+        return null;
+    }
     public static final String format(Integer year, Integer month,
             Integer day, Integer hour, Integer minute, Integer second,
             int tenthsOfSecond, int timeDiff, Character sign) {
+        if (year >= 00 && year <= 99) {
+            // valid range
+        } else if (year >= 1000 && year <= 9999) {
+            if (year < 1938) {
+                throw new IllegalArgumentException("Invalid year " + year + ". Minimum year is 1938");
+            }
+            if (year > 2037) {
+                throw new IllegalArgumentException("Invalid year " + year + ". Maximum year is 2037");
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid year " + year + ", not in expected");
+        }
+        
         Object[] args = new Object[] {year, month, day, hour, minute, second, tenthsOfSecond, timeDiff, sign};
         return MessageFormat.format(DATE_FORMAT, args);
+    }
+
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        int rawOffset = calendar.getTimeZone().getRawOffset();
+        
+        // Get the sign
+        char sign;
+        if (rawOffset > 0) {
+            sign = '+';
+        } else {
+            sign = '-';
+        }
+        
+        // Time difference in quarter hours
+        int timeDiff = (int)(Math.abs(rawOffset) / (15 * 60 * 1000));
+        System.out.println(new Date(calendar.getTimeInMillis()));
+        System.out.println(timeDiff + Character.toString(sign));
+        System.out.println(calendar.getTimeZone());
+        double hour = 25200000 / (1000d * 60 * 60);
+        System.out.println(hour);
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        System.out.println(calendar.getTime());
+        System.out.println(AbsoluteTimeFormatter.format(83, 01, 01, 00, 00, 00, 00, 00, '-'));
     }
 }
