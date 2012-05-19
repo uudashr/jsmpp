@@ -15,6 +15,7 @@
 package org.jsmpp.session.connection.socket;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import org.jsmpp.session.connection.Connection;
@@ -37,5 +38,12 @@ public class SocketConnectionFactory implements ConnectionFactory {
     public Connection createConnection(String host, int port)
             throws IOException {
         return new SocketConnection(new Socket(host, port));
+    }
+    public Connection createConnection(String host, int port, long timeout)
+            throws IOException {
+        Socket soc = new Socket();
+        InetSocketAddress endpoint = new InetSocketAddress(host, port);
+        soc.connect(endpoint, (int)timeout);
+        return new SocketConnection(soc);
     }
 }
