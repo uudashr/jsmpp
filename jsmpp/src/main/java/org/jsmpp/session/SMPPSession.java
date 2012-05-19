@@ -219,7 +219,7 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 			throw new IOException("Failed connecting");
 		}
 		
-		conn = connFactory.createConnection(host, port);
+		conn = connFactory.createConnection(host, port, timeout);
 		logger.info("Connected");
 		
 		conn.setSoTimeout(getEnquireLinkTimer());
