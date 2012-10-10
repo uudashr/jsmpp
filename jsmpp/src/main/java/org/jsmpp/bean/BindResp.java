@@ -29,7 +29,7 @@ public class BindResp extends Command {
     private static final long serialVersionUID = 6719708830304733989L;
     
     private String systemId;
-    private OptionalParameter[] optionalParameters;
+    private OptionalParameter[] optionalParameters = new OptionalParameter[]{};
     
     /**
      * Default constructor.
