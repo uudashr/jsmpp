@@ -108,7 +108,9 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	private MessageReceiverListener messageReceiverListener;
     private BoundSessionStateListener sessionStateListener = new BoundSessionStateListener();
     private SMPPSessionContext sessionContext = new SMPPSessionContext(this, sessionStateListener);
-	
+
+	private long lastEnquireLinkMillis = -1;
+
 	/**
      * Default constructor of {@link SMPPSession}. The next action might be
      * connect and bind to a destination message center.
@@ -607,8 +609,17 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	        try {
 	            Command pduHeader = null;
 	            byte[] pdu = null;
-	            
-                pduHeader = pduReader.readPDUHeader(in);
+
+				pduHeader = pduReader.readPDUHeader(in);
+				if (pduHeader == null) {
+					long current = System.currentTimeMillis();
+					if (current - lastEnquireLinkMillis > getEnquireLinkTimer()) {
+						lastEnquireLinkMillis = current;
+						notifyNoActivity();
+					}
+					return;
+				}
+				logger.trace("pdu header {}", pduHeader);
                 pdu = pduReader.readPDU(in, pduHeader);
 	            
                 /*
@@ -619,8 +630,9 @@ public class SMPPSession extends AbstractSession implements ClientSession {
                 PDUProcessTask task = new PDUProcessTask(pduHeader, pdu,
                         sessionContext, responseHandler,
                         sessionContext, onIOExceptionTask);
+				logger.trace("task created {}", task);
 	            executorService.execute(task);
-	            
+
 	        } catch (InvalidCommandLengthException e) {
 	            logger.warn("Receive invalid command length", e);
 	            try {
@@ -632,7 +644,7 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	        } catch (SocketTimeoutException e) {
 	            notifyNoActivity();
 	        } catch (IOException e) {
-	            logger.warn("IOException while reading: {}", e.getMessage());
+	            logger.warn("IOException while reading", e);
 	            close();
 	        }
 	    }
