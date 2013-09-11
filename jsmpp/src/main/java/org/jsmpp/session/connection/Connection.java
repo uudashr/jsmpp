@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 /**
  * Connection object.
@@ -32,4 +33,6 @@ public interface Connection {
     OutputStream getOutputStream();
     void setSoTimeout(int timeout) throws IOException;
     void close() throws IOException;
+
+	int getSoTimeout() throws SocketException;
 }

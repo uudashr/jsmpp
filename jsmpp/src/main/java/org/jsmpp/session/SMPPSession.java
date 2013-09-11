@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * 
  * All SMPP operation (request-response) is blocking, for an example: SUBMIT_SM
  * will be blocked until SUBMIT_SM_RESP received or timeout. This looks like
- * synchronous communication, but the {@link SMPPClient} implementation give
+ * synchronous communication, but the implementation give
  * ability to the asynchronous way by executing the SUBMIT_SM operation parallel
  * on a different thread. The very simple implementation by using Thread pool,
  * {@link ExecutorService} will do.
@@ -108,7 +108,9 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	private MessageReceiverListener messageReceiverListener;
     private BoundSessionStateListener sessionStateListener = new BoundSessionStateListener();
     private SMPPSessionContext sessionContext = new SMPPSessionContext(this, sessionStateListener);
-	
+
+	private long lastEnquireLinkMillis = -1;
+
 	/**
      * Default constructor of {@link SMPPSession}. The next action might be
      * connect and bind to a destination message center.
@@ -269,7 +271,7 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	 * @param bindType is the bind type.
 	 * @param systemId is the system id.
 	 * @param password is the password.
-	 * @param systemTypeis the system type.
+	 * @param systemType is the system type.
 	 * @param interfaceVersion is the interface version.
 	 * @param addrTon is the address TON.
 	 * @param addrNpi is the address NPI.
@@ -459,7 +461,9 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 		if(Thread.currentThread() != pduReaderWorker) {
 			try {
 				if(pduReaderWorker != null) {
+				    logger.trace("Try to join pduReaderWorker thread");
 					pduReaderWorker.join();
+					logger.trace("Joined");
 				}
 			} catch (InterruptedException e) {
 				logger.warn("Interrupted while waiting for pduReaderWorker thread to exit");
@@ -597,6 +601,7 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 			while (isReadPdu()) {
                 readPDU();
 			}
+			logger.trace("Main PDUReaderWorker loop was done");
 			close();
 			executorService.shutdown();
 			try {
@@ -611,8 +616,17 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	        try {
 	            Command pduHeader = null;
 	            byte[] pdu = null;
-	            
-                pduHeader = pduReader.readPDUHeader(in);
+
+				pduHeader = pduReader.readPDUHeader(in);
+				if (pduHeader == null) {
+					long current = System.currentTimeMillis();
+					if (current - lastEnquireLinkMillis > getEnquireLinkTimer()) {
+						lastEnquireLinkMillis = current;
+						notifyNoActivity();
+					}
+					return;
+				}
+				logger.trace("pdu header {}", pduHeader);
                 pdu = pduReader.readPDU(in, pduHeader);
 	            
                 /*
@@ -623,8 +637,9 @@ public class SMPPSession extends AbstractSession implements ClientSession {
                 PDUProcessTask task = new PDUProcessTask(pduHeader, pdu,
                         sessionContext, responseHandler,
                         sessionContext, onIOExceptionTask);
+				logger.trace("task created {}", task);
 	            executorService.execute(task);
-	            
+
 	        } catch (InvalidCommandLengthException e) {
 	            logger.warn("Receive invalid command length", e);
 	            try {
@@ -636,7 +651,7 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	        } catch (SocketTimeoutException e) {
 	            notifyNoActivity();
 	        } catch (IOException e) {
-	            logger.warn("IOException while reading: {}", e.getMessage());
+	            logger.warn("IOException while reading", e);
 	            close();
 	        }
 	    }

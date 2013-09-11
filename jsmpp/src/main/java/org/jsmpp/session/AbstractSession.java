@@ -217,7 +217,8 @@ public abstract class AbstractSession implements Session {
 		} catch (InterruptedException e) {
 			logger.warn("interrupted while waiting for enquireLinkSender thread to exit");
 		}
-    }
+		logger.trace("AbstractSession.close() done");
+	}
     
     /**
      * Validate the response, the command_status should be 0 otherwise will
