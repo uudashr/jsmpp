@@ -270,8 +270,7 @@ public abstract class OptionalParameter {
         
         @Override
         public String getValueAsString() {
-            byte[] value = getValue();
-            return new String(value, 0, value.length - 1);
+            return new String(getValue());
         }
         
     }
@@ -1542,7 +1541,7 @@ public abstract class OptionalParameter {
 	 * The ms_availability_status parameter is used in the alert_notification operation to indicate the
 	 * availability state of the MS to the ESME. <br>
 	 * If the SMSC does not include the parameter in the alert_notification operation, the ESME
-	 * should assume that the MS is in an «available» state. <br>
+	 * should assume that the MS is in an "available" state. <br>
 	 * <br>
 	 * 0 = Available (Default) <br>
 	 * 1 = Denied (e.g. suspended, no SMS capability, etc.) <br>
