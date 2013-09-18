@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.jsmpp.session.SMPPSession;
 import org.jsmpp.session.connection.Connection;
@@ -46,8 +47,12 @@ public class SocketConnection implements Connection {
     public void setSoTimeout(int timeout) throws IOException {
         socket.setSoTimeout(timeout);
     }
-    
-    public void close() {
+
+	public int getSoTimeout() throws SocketException {
+		return socket.getSoTimeout();
+	}
+
+	public void close() {
         try {
             socket.close();
         } catch (IOException e) {

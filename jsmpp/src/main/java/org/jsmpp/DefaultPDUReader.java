@@ -19,6 +19,8 @@ import java.io.IOException;
 
 import org.jsmpp.bean.Command;
 import org.jsmpp.util.OctetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -30,27 +32,47 @@ import org.jsmpp.util.OctetUtil;
  * 
  */
 public class DefaultPDUReader implements PDUReader {
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultPDUReader.class);
 
     /* (non-Javadoc)
      * @see org.jsmpp.PDUReader#readPDUHeader(java.io.DataInputStream)
      */
     public Command readPDUHeader(DataInputStream in)
             throws InvalidCommandLengthException, IOException {
-        Command header = new Command();
-        header.setCommandLength(in.readInt());
+		final String DEBUG_STR = ":readPDUHeader: ";
+		int available = in.available();
+		if (available == 0 ) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				LOG.error("{} ", DEBUG_STR, e);
+			}
+			return null;
+		}
+
+		Command header = new Command();
+		int commandLength = in.readInt();
+		LOG.trace("{} command length {}, available in stream {}", new Object[] {DEBUG_STR, commandLength, in.available()});
+		header.setCommandLength(commandLength);
 
         if (header.getCommandLength() < 16) {
-            // command length to short, read the left dump anyway
+			LOG.trace("{} command length is too short", DEBUG_STR);            // command length to short, read the left dump anyway
             byte[] dump = new byte[header.getCommandLength()];
             in.read(dump, 4, header.getCommandLength() - 4);
 
             throw new InvalidCommandLengthException("Command length "
                     + header.getCommandLength() + " is to short");
         }
-        header.setCommandId(in.readInt());
-        header.setCommandStatus(in.readInt());
-        header.setSequenceNumber(in.readInt());
-        return header;
+		int commandId = in.readInt();
+		LOG.trace("{} command id {}, available in stream {}", new Object[] {DEBUG_STR, commandId, in.available()});
+		header.setCommandId(commandId);
+		int commandStatus = in.readInt();
+		LOG.trace("{} command status {}, available in stream {}", new Object[] {DEBUG_STR, commandStatus, in.available()});
+		header.setCommandStatus(commandStatus);
+		int sequenceNumber = in.readInt();
+		LOG.trace("{} command number {}, available in stream {}", new Object[] {DEBUG_STR, sequenceNumber, in.available()});
+		header.setSequenceNumber(sequenceNumber);
+		return header;
     }
 
     /* (non-Javadoc)
