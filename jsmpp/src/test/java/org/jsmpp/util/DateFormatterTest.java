@@ -74,21 +74,42 @@ public class DateFormatterTest {
     public void formatAbsoluteDate() {
         TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
 
-        GregorianCalendar date = new GregorianCalendar(Locale.GERMANY);
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"), Locale.GERMANY);
         date.set(Calendar.YEAR, 2013);
         date.set(Calendar.MONTH, Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH, 1);
-        date.set(Calendar.HOUR, 1);
+        date.set(Calendar.HOUR_OF_DAY, 1);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
 
-        assertEquals(timeFormatter.format(date), "130101130000004+");
+        assertEquals(timeFormatter.format(date), "130101010000004+");
 
         date.set(Calendar.MONTH, Calendar.JULY);
 
         // because of daylight saving time, we have a different offset
-        assertEquals(timeFormatter.format(date), "130701130000008+");
+        assertEquals(timeFormatter.format(date), "130701010000008+");
+    }
+
+    @Test(groups="checkintest")
+    public void formatAbsoluteDateRussia() {
+        TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
+
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Asia/Yekaterinburg"), new Locale("ru", "RU"));
+        date.set(Calendar.YEAR, 2013);
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 1);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        assertEquals(timeFormatter.format(date), "130101010000024+");
+
+        date.set(Calendar.MONTH, Calendar.JULY);
+
+        // we have the same offset because of the absent of daylight saving time
+        assertEquals(timeFormatter.format(date), "130701010000024+");
     }
 
     @Test(groups="checkintest")
@@ -96,7 +117,7 @@ public class DateFormatterTest {
         RelativeTimeFormatter timeFormatter = new RelativeTimeFormatter(TimeZone.getTimeZone("America/Denver"));
 
         // at this date neither Denver nor Germany has daylight saving time
-        GregorianCalendar date = new GregorianCalendar(Locale.GERMANY);
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"), Locale.GERMANY);
         date.set(Calendar.YEAR, 2013);
         date.set(Calendar.MONTH, Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH, 1);
