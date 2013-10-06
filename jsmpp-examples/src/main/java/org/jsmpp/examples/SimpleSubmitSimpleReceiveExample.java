@@ -1,16 +1,12 @@
 /*
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  * 
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.jsmpp.examples;
 
@@ -76,9 +72,9 @@ public class SimpleSubmitSimpleReceiveExample {
 
             String messageId = session.submitShortMessage("CMT", TypeOfNumber.INTERNATIONAL,
                     NumberingPlanIndicator.UNKNOWN, "1616", TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN,
-                    "628176504657", new ESMClass(), (byte)0, (byte)1, timeFormatter.format(new Date()), null,
-                    registeredDelivery, (byte)0, new GeneralDataCoding(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS1,
-                            false), (byte)0, message.getBytes());
+                    "628176504657", new ESMClass(), (byte) 0, (byte) 1, SimpleSubmitSimpleReceiveExample.timeFormatter.format(new Date()), null,
+                    registeredDelivery, (byte) 0, new GeneralDataCoding(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS1,
+                            false), (byte) 0, message.getBytes());
 
             System.out.println("Message submitted, message_id is " + messageId);
 
@@ -109,7 +105,8 @@ public class SimpleSubmitSimpleReceiveExample {
         // Set listener to receive deliver_sm
         session.setMessageReceiverListener(new MessageReceiverListener() {
 
-            public void onAcceptDeliverSm(DeliverSm deliverSm) throws ProcessRequestException {
+            @Override
+            public boolean onAcceptDeliverSm(DeliverSm deliverSm) throws ProcessRequestException {
                 if (MessageType.SMSC_DEL_RECEIPT.containedIn(deliverSm.getEsmClass())) {
                     // delivery receipt
                     try {
@@ -125,12 +122,15 @@ public class SimpleSubmitSimpleReceiveExample {
                     // regular short message
                     System.out.println("Receiving message : " + new String(deliverSm.getShortMessage()));
                 }
+                return true;
             }
 
+            @Override
             public void onAcceptAlertNotification(AlertNotification alertNotification) {
                 System.out.println("onAcceptAlertNotification");
             }
 
+            @Override
             public DataSmResult onAcceptDataSm(DataSm dataSm, Session source) throws ProcessRequestException {
                 System.out.println("onAcceptDataSm");
                 return null;
