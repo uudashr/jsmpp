@@ -1,4 +1,5 @@
 #common
+test-output/
 target/
 out/
 classes/
