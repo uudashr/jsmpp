@@ -421,6 +421,8 @@ public class SMPPSession extends AbstractSession implements ClientSession {
     @Override
     public void sendDeliverSmResp(DeliverSm deliverSm) throws PDUException, ResponseTimeoutException,
             InvalidResponseException, NegativeResponseException, IOException {
+        ensureTransmittable("deliverSmResp");
+
         pduSender().sendDeliverSmResp(out, 0 /* deliverSm.getCommandStatus() */, deliverSm.getSequenceNumber());
         SMPPSession.logger.debug("deliver_sm_resp with seq_number " + deliverSm.getSequenceNumber() + " has been sent");
     }
