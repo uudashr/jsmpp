@@ -17,7 +17,7 @@ import org.jsmpp.PDUException;
 import org.jsmpp.bean.Address;
 import org.jsmpp.bean.BindType;
 import org.jsmpp.bean.DataCoding;
-import org.jsmpp.bean.DeliverSm;
+import org.jsmpp.bean.DeliverSmResp;
 import org.jsmpp.bean.ESMClass;
 import org.jsmpp.bean.NumberingPlanIndicator;
 import org.jsmpp.bean.OptionalParameter;
@@ -164,7 +164,7 @@ public interface ClientSession extends Session {
             ResponseTimeoutException, InvalidResponseException,
             NegativeResponseException, IOException;
 
-    void sendDeliverSmResp(DeliverSm deliverSm) throws PDUException, ResponseTimeoutException,
+    void sendDeliverSmResp(DeliverSmResp deliverSmRes) throws PDUException, ResponseTimeoutException,
             InvalidResponseException, NegativeResponseException, IOException;
 
     /**

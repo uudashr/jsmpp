@@ -37,6 +37,7 @@ import org.jsmpp.bean.Command;
 import org.jsmpp.bean.DataCoding;
 import org.jsmpp.bean.DataSm;
 import org.jsmpp.bean.DeliverSm;
+import org.jsmpp.bean.DeliverSmResp;
 import org.jsmpp.bean.ESMClass;
 import org.jsmpp.bean.InterfaceVersion;
 import org.jsmpp.bean.NumberingPlanIndicator;
@@ -416,15 +417,15 @@ public class SMPPSession extends AbstractSession implements ClientSession {
     /*
      * (non-Javadoc)
      * 
-     * @see org.jsmpp.session.ClientSession#sendDeliverSmResp(org.jsmpp.bean.DeliverSm)
+     * @see org.jsmpp.session.ClientSession#sendDeliverSmResp(org.jsmpp.bean.DeliverSmResp)
      */
     @Override
-    public void sendDeliverSmResp(DeliverSm deliverSm) throws PDUException, ResponseTimeoutException,
+    public void sendDeliverSmResp(DeliverSmResp deliverSmResp) throws PDUException, ResponseTimeoutException,
             InvalidResponseException, NegativeResponseException, IOException {
         ensureTransmittable("deliverSmResp");
 
-        pduSender().sendDeliverSmResp(out, 0 /* deliverSm.getCommandStatus() */, deliverSm.getSequenceNumber());
-        SMPPSession.logger.debug("deliver_sm_resp with seq_number " + deliverSm.getSequenceNumber() + " has been sent");
+        pduSender().sendDeliverSmResp(out, deliverSmResp.getCommandStatus(), deliverSmResp.getSequenceNumber());
+        SMPPSession.logger.debug("deliver_sm_resp with seq_number " + deliverSmResp.getSequenceNumber() + " has been sent");
     }
 
     /*
