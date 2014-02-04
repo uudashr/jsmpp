@@ -22,4 +22,5 @@ import java.io.IOException;
  */
 public interface ConnectionFactory {
     Connection createConnection(String host, int port) throws IOException;
+    Connection createConnection(String host, int port, long timeout) throws IOException;
 }
