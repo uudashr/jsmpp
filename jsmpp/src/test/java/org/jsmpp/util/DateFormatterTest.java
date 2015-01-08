@@ -74,21 +74,21 @@ public class DateFormatterTest {
     public void formatAbsoluteDate() {
         TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
 
-        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("CET"));
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"));
         date.set(Calendar.YEAR, 2013);
         date.set(Calendar.MONTH, Calendar.JANUARY);
-        date.set(Calendar.DAY_OF_MONTH, 1);
-        date.set(Calendar.HOUR, 1);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
+        date.set(Calendar.DAY_OF_MONTH, 2);
+        date.set(Calendar.HOUR, 13);
+        date.set(Calendar.MINUTE, 46);
+        date.set(Calendar.SECOND, 10);
+        date.set(Calendar.MILLISECOND, 800);
 
-        assertEquals(timeFormatter.format(date), "130101130000004+");
+        assertEquals(timeFormatter.format(date), "130102134610804+");
 
         date.set(Calendar.MONTH, Calendar.JULY);
 
         // because of daylight saving time, we have a different offset
-        assertEquals(timeFormatter.format(date), "130701130000008+");
+        assertEquals(timeFormatter.format(date), "130702134610808+");
     }
 
     @Test(groups="checkintest")
@@ -96,11 +96,11 @@ public class DateFormatterTest {
         RelativeTimeFormatter timeFormatter = new RelativeTimeFormatter(TimeZone.getTimeZone("America/Denver"));
 
         // at this date neither Denver nor Germany has daylight saving time
-        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("CET"));
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"));
         date.set(Calendar.YEAR, 2013);
         date.set(Calendar.MONTH, Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH, 1);
-        date.set(Calendar.HOUR, 1);
+        date.set(Calendar.HOUR, 13);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
