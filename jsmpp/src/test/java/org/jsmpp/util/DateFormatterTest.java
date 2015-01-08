@@ -101,22 +101,23 @@ public class DateFormatterTest {
         date.set(Calendar.MONTH, Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH, 1);
         date.set(Calendar.HOUR, 13);
-        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.MINUTE, 46);
         date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
+        // Tenth of seconds should be ignored
+        date.set(Calendar.MILLISECOND, 800);
 
-        assertEquals(timeFormatter.format(date), "130101050000000R");
+        assertEquals(timeFormatter.format(date), "130101054600000R");
         
         // at this date Denver has already daylight saving time but not Germany
         date.set(Calendar.MONTH, Calendar.MARCH);
         date.set(Calendar.DAY_OF_MONTH, 20);
         
-        assertEquals(timeFormatter.format(date), "130320060000000R");
+        assertEquals(timeFormatter.format(date), "130320064600000R");
 
         // at this date Denver and Germany has daylight saving time
         date.set(Calendar.MONTH, Calendar.APRIL);
         date.set(Calendar.DAY_OF_MONTH, 1);
 
-        assertEquals(timeFormatter.format(date), "130401050000000R");
+        assertEquals(timeFormatter.format(date), "130401054600000R");
     }
 }

@@ -63,7 +63,7 @@ public class RelativeTimeFormatter implements TimeFormatter {
         
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(relativeTime);
-        int year = cal.get(Calendar.YEAR) - 2000;
+        int year = cal.get(Calendar.YEAR) % 100;
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH);
         int hour = cal.get(Calendar.HOUR_OF_DAY);

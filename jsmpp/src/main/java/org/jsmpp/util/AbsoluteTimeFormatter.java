@@ -38,7 +38,7 @@ public class AbsoluteTimeFormatter implements TimeFormatter {
         if (calendar == null) {
             return null;
         }
-        int year = calendar.get(Calendar.YEAR) - 2000;
+        int year = calendar.get(Calendar.YEAR) % 100;
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
