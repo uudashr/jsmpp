@@ -111,7 +111,7 @@ public class DateFormatterTest {
         // at this date Denver has already daylight saving time but not Germany
         date.set(Calendar.MONTH, Calendar.MARCH);
         date.set(Calendar.DAY_OF_MONTH, 20);
-        
+
         assertEquals(timeFormatter.format(date), "130320064600000R");
 
         // at this date Denver and Germany has daylight saving time

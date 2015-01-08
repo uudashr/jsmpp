@@ -57,12 +57,8 @@ public class RelativeTimeFormatter implements TimeFormatter {
             return null;
         }
         
-        long relativeTime = calendar.getTimeInMillis()
-                - calendar.getTimeZone().getOffset(calendar.getTimeInMillis())
-                + timezone.getOffset(calendar.getTimeInMillis());
-        
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(relativeTime);
+        Calendar cal = Calendar.getInstance(timezone);
+        cal.setTimeInMillis(calendar.getTimeInMillis());
         int year = cal.get(Calendar.YEAR) % 100;
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH);
