@@ -235,11 +235,12 @@ public class OptionalParameters {
     @SuppressWarnings("unchecked")
     public static <U extends OptionalParameter> U get(Class<U> tagClass, OptionalParameter[] parameters)
     {
-        for(OptionalParameter i: parameters) {
-            if(i.getClass() == tagClass) {
-                return (U)i;
-            }
-        }
+    	if (parameters!=null)
+	        for(OptionalParameter i: parameters) {
+	            if(i.getClass() == tagClass) {
+	                return (U)i;
+	            }
+	        }
         logger.info("optional tag " + tagClass + " not found");
         return null;
     }
