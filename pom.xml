@@ -19,17 +19,27 @@
         <developer>
             <name>Nuruddin Ashr</name>
         </developer>
+        <developer>
+            <name>Daniel Pocock</name>
+            <email>daniel@pocock.pro</email>
+            <url>http://danielpocock.com</url>
+        </developer>
+        <developer>
+            <name>Pim Moerenhout</name>
+            <email>pim.moerenhout@gmail.com</email>
+        </developer>
     </developers>
 
     <properties>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
         <buildNumber>${maven.build.timestamp}</buildNumber>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.12</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.12</junit.version>
         <testng.version>5.14.10</testng.version>
-        <joda-time.version>2.6</joda-time.version>
+        <commons-codec.version>1.10</commons-codec.version>
+        <joda-time.version>2.7</joda-time.version>
         <git.properties>git.properties</git.properties>
     </properties>
 
@@ -84,7 +94,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.4</version>
+                <version>${commons-codec.version}</version>
             </dependency>
 
             <dependency>
