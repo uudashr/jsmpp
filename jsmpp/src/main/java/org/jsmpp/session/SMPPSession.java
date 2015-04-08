@@ -218,23 +218,23 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 		if (sequence().currentValue() != 1) {
 			throw new IOException("Failed connecting");
 		}
-		
+
 		conn = connFactory.createConnection(host, port);
 		logger.info("Connected");
-		
+
 		conn.setSoTimeout(getEnquireLinkTimer());
-		
+
 		sessionContext.open();
 		try {
 			in = new DataInputStream(conn.getInputStream());
 			out = conn.getOutputStream();
-			
+
 			pduReaderWorker = new PDUReaderWorker();
 			pduReaderWorker.start();
 			String smscSystemId = sendBind(bindParam.getBindType(), bindParam.getSystemId(), bindParam.getPassword(), bindParam.getSystemType(),
                     bindParam.getInterfaceVersion(), bindParam.getAddrTon(), bindParam.getAddrNpi(), bindParam.getAddressRange(), timeout);
 			sessionContext.bound(bindParam.getBindType());
-			
+
 			enquireLinkSender = new EnquireLinkSender();
 			enquireLinkSender.start();
 			return smscSystemId;
@@ -636,9 +636,12 @@ public class SMPPSession extends AbstractSession implements ClientSession {
 	        } catch (SocketTimeoutException e) {
 	            notifyNoActivity();
 	        } catch (IOException e) {
-	            logger.warn("IOException while reading: {}", e.getMessage());
-	            close();
-	        }
+						logger.warn("IOException while reading: {}", e.getMessage());
+						close();
+					}	catch (RuntimeException e) {
+							logger.warn("RuntimeException: {}", e.getMessage());
+							unbindAndClose();
+					}
 	    }
 		
 	    /**

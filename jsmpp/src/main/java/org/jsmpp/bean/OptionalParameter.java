@@ -256,23 +256,32 @@ public abstract class OptionalParameter {
     public static class COctetString extends OctetString {
 
         public COctetString(short tag, String value, String charsetName)
-                throws UnsupportedEncodingException {
-            super(tag, value, charsetName);
-        }
+				throws UnsupportedEncodingException {
+			super(tag, new byte[value.getBytes(charsetName).length + 1]);
+			byte[] bytes = value.getBytes(charsetName);
+			System.arraycopy(bytes, 0, this.value, 0, bytes.length);
+			this.value[bytes.length] = (byte) 0x00;
+		}
 
-        public COctetString(short tag, String value) {
-            super(tag, value);
-        }
-        
-        public COctetString(short tag, byte[] value) {
-            super(tag, value);
-        }
-        
-        @Override
-        public String getValueAsString() {
-            return new String(getValue());
-        }
-        
+		public COctetString(short tag, String value) {
+			super(tag, new byte[value.getBytes().length + 1]);
+			byte[] bytes = value.getBytes();
+			System.arraycopy(bytes, 0, this.value, 0, bytes.length);
+			this.value[bytes.length] = (byte) 0x00;
+			return;
+		}
+
+		public COctetString(short tag, byte[] value) {
+			super(tag, value);
+		}
+
+		@Override
+		public String getValueAsString() {
+			byte[] s = new byte[(value.length > 0 ? value.length - 1 : 0)];
+			System.arraycopy(value, 0, s, 0, s.length);
+			return new String(s);
+		}
+
     }
     
     /**
@@ -2150,6 +2159,9 @@ public abstract class OptionalParameter {
 			super(tag, value);
 			try {
 				address = new String(value, 2, value.length-2, "ISO-8859-1");
+			} catch (StringIndexOutOfBoundsException e) {
+				// TODO: do something better
+				e.printStackTrace();
 			} catch (UnsupportedEncodingException e) {
 				// TODO: do something better
 				e.printStackTrace();
