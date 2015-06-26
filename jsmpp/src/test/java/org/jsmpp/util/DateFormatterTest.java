@@ -74,11 +74,11 @@ public class DateFormatterTest {
     public void formatAbsoluteDate() {
         TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
 
-        GregorianCalendar date = new GregorianCalendar(Locale.GERMANY);
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"), Locale.GERMANY);
         date.set(Calendar.YEAR, 2013);
         date.set(Calendar.MONTH, Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH, 1);
-        date.set(Calendar.HOUR, 1);
+        date.set(Calendar.HOUR_OF_DAY, 13);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
@@ -96,11 +96,11 @@ public class DateFormatterTest {
         RelativeTimeFormatter timeFormatter = new RelativeTimeFormatter(TimeZone.getTimeZone("America/Denver"));
 
         // at this date neither Denver nor Germany has daylight saving time
-        GregorianCalendar date = new GregorianCalendar(Locale.GERMANY);
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"), Locale.GERMANY);
         date.set(Calendar.YEAR, 2013);
         date.set(Calendar.MONTH, Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH, 1);
-        date.set(Calendar.HOUR, 1);
+        date.set(Calendar.HOUR_OF_DAY, 13);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
