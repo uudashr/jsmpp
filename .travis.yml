@@ -1,7 +1,6 @@
 language: java
 os:
  - linux
- - osx
 before_install:
  - date -u
  - uname -a
