@@ -1,0 +1,20 @@
+language: java
+os:
+ - linux
+ - osx
+before_install:
+ - date -u
+ - uname -a
+ - env | sort
+branches:
+ only:
+   - master
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+  - openjdk7
+notifications:
+ email:
+  - support@openam.org.ru
+script:
+  - mvn install
