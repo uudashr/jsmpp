@@ -54,11 +54,11 @@ class SMPPSessionOpen implements SMPPSessionState {
                 .removeSentItem(pduHeader.getSequenceNumber());
         if (pendingResp != null) {
             try {
-                logger.debug("Bind Response header ({}, {}, {}, {})",
+                logger.debug("Bind Response header ({}, {}, {}, {})",new Object[] {
                     pduHeader.getCommandLength(),
                     pduHeader.getCommandIdAsHex(),
                     IntUtil.toHexString(pduHeader.getCommandStatus()),
-                    pduHeader.getSequenceNumber());
+                    pduHeader.getSequenceNumber()});
                 BindResp resp = pduDecomposer.bindResp(pdu);
                 pendingResp.done(resp);
             } catch (PDUStringException e) {

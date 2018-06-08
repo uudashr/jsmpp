@@ -32,7 +32,7 @@ public enum StringParameter {
 	 * password string parameter.
 	 */
 	//SMPP providers may be use long passwords over SMPP 3.4 standard (like t-sms.ru) 
-	PASSWORD(StringType.C_OCTEC_STRING, 0, 256, true, SMPPConstant.STAT_ESME_RINVPASWD),
+	PASSWORD(StringType.C_OCTET_STRING, 0, 256, true, SMPPConstant.STAT_ESME_RINVPASWD),
     
 	/**
 	 * system_type string parameter.
