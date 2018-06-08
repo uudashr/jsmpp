@@ -22,11 +22,21 @@ import org.jsmpp.util.InvalidDeliveryReceiptException;
  *
  */
 public class DeliverSm extends MessageRequest {
-    
+
+	private String id;
+
 	public DeliverSm() {
 		super();
 	}
-	
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	/**
      * Get the short message as {@link DeliveryReceipt}. This method will be
      * valid if the parsed short message valid and Message Type (esm_class)
@@ -63,7 +73,7 @@ public class DeliverSm extends MessageRequest {
 	
 	/**
 	 * Message Type.
-	 * @param value
+	 * @return
 	 */
 	public void setSmscDeliveryReceipt() {
 		esmClass = composeSmscDeliveryReceipt(esmClass);
@@ -81,7 +91,7 @@ public class DeliverSm extends MessageRequest {
 	 * Message Type.
 	 */
 	public void setSmeManualAcknowledgment() {
-		esmClass = composeSmeManualAcknowledment(esmClass);
+		esmClass = composeSmeManualAcknowledgment(esmClass);
 	}
 	
 	/**
@@ -209,7 +219,7 @@ public class DeliverSm extends MessageRequest {
 	 * @param esmClass
 	 * @return
 	 */
-	public static final byte composeSmeDeliveryAcknowledment(byte esmClass) {
+	public static final byte composeSmeDeliveryAcknowledgment(byte esmClass) {
 		return composeMessageType(esmClass, SMPPConstant.ESMCLS_SME_DELIV_ACK);
 	}
 	
@@ -227,7 +237,7 @@ public class DeliverSm extends MessageRequest {
 	 * @param esmClass
 	 * @return
 	 */
-	public static final byte composeSmeManualAcknowledment(byte esmClass) {
+	public static final byte composeSmeManualAcknowledgment(byte esmClass) {
 		return composeMessageType(esmClass, SMPPConstant.ESMCLS_SME_MANUAL_ACK);
 	}
 	

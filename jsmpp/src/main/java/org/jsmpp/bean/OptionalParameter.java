@@ -38,7 +38,7 @@ public abstract class OptionalParameter {
 
     /** Convert the optional parameter into a byte serialized form conforming to the SMPP specification.
      * 
-     * @return A byte array according to SMPP specification
+     * @return A byte array according to the SMPP specification
      */
     public byte[] serialize() {
         byte[] value = serializeValue();
@@ -49,8 +49,8 @@ public abstract class OptionalParameter {
         return buffer.array();
     }
 
-    /** This method should serialize the value part of the optional parameter. The format of the value is dependant
-     * on the specific optional parameter type so it is abstract and must be implmented by subclasses.
+    /** This method should serialize the value part of the optional parameter. The format of the value is dependent
+     * on the specific optional parameter type so it is abstract and must be implemented by subclasses.
      * @return
      */
     protected abstract byte[] serializeValue();
@@ -119,6 +119,7 @@ public abstract class OptionalParameter {
         /**
          * Print Optional Parameter byte in hex format
          */
+        @Override
         public String toString()
         {
             return HexUtil.conventBytesToHexString(OctetUtil.shortToBytes(value));
@@ -157,6 +158,7 @@ public abstract class OptionalParameter {
         /**
          * Print Optional Parameter byte in hex format
          */
+        @Override
         public String toString()
         {
             return HexUtil.conventBytesToHexString(OctetUtil.intToBytes(value));
@@ -195,6 +197,7 @@ public abstract class OptionalParameter {
         /**
          * Print Optional Parameter byte in hex format
          */
+        @Override
         public String toString()
         {
             return HexUtil.conventBytesToHexString(new byte[] {getValue()});
@@ -238,7 +241,7 @@ public abstract class OptionalParameter {
         public byte[] getValue() {
             return value;
         }
-        
+
         public String getValueAsString() {
             return new String(value);
         }
@@ -256,30 +259,39 @@ public abstract class OptionalParameter {
     public static class COctetString extends OctetString {
 
         public COctetString(short tag, String value, String charsetName)
-                throws UnsupportedEncodingException {
-            super(tag, value, charsetName);
-        }
+				throws UnsupportedEncodingException {
+			super(tag, new byte[value.getBytes(charsetName).length + 1]);
+			byte[] bytes = value.getBytes(charsetName);
+			System.arraycopy(bytes, 0, this.value, 0, bytes.length);
+			this.value[bytes.length] = (byte) 0x00;
+		}
 
-        public COctetString(short tag, String value) {
-            super(tag, value);
-        }
-        
-        public COctetString(short tag, byte[] value) {
-            super(tag, value);
-        }
-        
-        @Override
-        public String getValueAsString() {
-            return new String(getValue());
-        }
-        
+		public COctetString(short tag, String value) {
+			super(tag, new byte[value.getBytes().length + 1]);
+			byte[] bytes = value.getBytes();
+			System.arraycopy(bytes, 0, this.value, 0, bytes.length);
+			this.value[bytes.length] = (byte) 0x00;
+			return;
+		}
+
+		public COctetString(short tag, byte[] value) {
+			super(tag, value);
+		}
+
+		@Override
+		public String getValueAsString() {
+			byte[] s = new byte[value.length > 0 ? value.length - 1 : 0];
+			System.arraycopy(value, 0, s, 0, s.length);
+			return new String(s);
+		}
+
     }
     
     /**
      * Represents valid values for the optional parameters dest_addr_subunit and source_addr_subunit.
      *
      */
-	public static enum Addr_subunit{
+	public enum Addr_subunit{
 		/**
 		 * 0x00 = Unknown (default)
 		 */
@@ -306,7 +318,8 @@ public abstract class OptionalParameter {
 		RESERVED(0x05);
 		
 		protected byte value;
-		private Addr_subunit(int value) {
+
+		Addr_subunit(int value) {
 			this.value = (byte)value;
 		}
 		
@@ -354,6 +367,7 @@ public abstract class OptionalParameter {
 			return Addr_subunit.toEnum(value);
 		}
 
+		@Override
 		public String toString() {
 			return getDestAddrSubunit().toString();
 		}
@@ -363,7 +377,7 @@ public abstract class OptionalParameter {
 	 * Represents valid values for the optional parameters dest_network_type and source_network_type.
 	 *
 	 */
-	public static enum Network_type {
+	public enum Network_type {
 		UNKNOWN(0x00),
 		GSM(0x01),
 		ANSI_136_TDMA(0x02),
@@ -376,10 +390,11 @@ public abstract class OptionalParameter {
 		RESERVED(0x09);
 		
 		protected byte value;
-		private Network_type(int value) {
+
+		Network_type(int value) {
 			this.value = (byte)value;
 		}
-		
+
 		public byte value() {
 			return value;
 		}
@@ -425,6 +440,7 @@ public abstract class OptionalParameter {
 			return Network_type.toEnum(value);
 		}
 
+		@Override
 		public String toString() {
 			return getDestNetworkType().toString();
 		}
@@ -434,7 +450,7 @@ public abstract class OptionalParameter {
 	 * Represents valid values for the optional parameters dest_bearer_type and source_bearer_type.
 	 *
 	 */
-	public static enum Bearer_type {
+	public enum Bearer_type {
 		UNKNOWN(0x00),
 		SMS(0x01),
 		CIRCUIT_SWITCHED_DATA(0x02),
@@ -447,7 +463,8 @@ public abstract class OptionalParameter {
 		RESERVED(0x09);
 
 		protected byte value;
-		private Bearer_type(int value) {
+
+		Bearer_type(int value) {
 			this.value = (byte)value;
 		}
 
@@ -496,6 +513,7 @@ public abstract class OptionalParameter {
 			return Bearer_type.toEnum(value);
 		}
 
+		@Override
 		public String toString() {
 			return getDestBearerType().toString();
 		}
@@ -554,6 +572,7 @@ public abstract class OptionalParameter {
 			return Addr_subunit.toEnum(value);
 		}
 
+		@Override
 		public String toString() {
 			return getSourceAddrSubunit().toString();
 		}
@@ -589,6 +608,7 @@ public abstract class OptionalParameter {
 			return Network_type.toEnum(value);
 		}
 
+		@Override
 		public String toString() {
 			return getSourceNetworkType().toString();
 		}
@@ -623,7 +643,8 @@ public abstract class OptionalParameter {
 		public Bearer_type getSourceBearerType() {
 			return Bearer_type.toEnum(value);
 		}
-		
+
+		@Override
 		public String toString() {
 			return getSourceBearerType().toString();
 		}
@@ -704,7 +725,8 @@ public abstract class OptionalParameter {
 			RESERVED(255);
 
 			protected byte value;
-			private Payload_type_enum(int value) {
+
+			Payload_type_enum(int value) {
 				this.value = (byte)value;
 			}
 
@@ -740,7 +762,8 @@ public abstract class OptionalParameter {
 		public Payload_type_enum getPayloadType() {
 			return Payload_type_enum.toEnum(value);
 		}
-		
+
+		@Override
 		public String toString() {
 			return getPayloadType().toString();
 		}
@@ -758,6 +781,9 @@ public abstract class OptionalParameter {
 		public Additional_status_info_text(byte[] value) {
 			super(Tag.ADDITIONAL_STATUS_INFO_TEXT.code(), value);
 		}
+		public Additional_status_info_text(String value) {
+			super(Tag.ADDITIONAL_STATUS_INFO_TEXT.code(), value);
+		}
 	}
 
 	/** 
@@ -771,8 +797,10 @@ public abstract class OptionalParameter {
 	 *
 	 */
 	public static class Receipted_message_id extends OptionalParameter.COctetString {
-
 		public Receipted_message_id(byte[] value) {
+			super(Tag.RECEIPTED_MESSAGE_ID.code(), value);
+		}
+		public Receipted_message_id(String value) {
 			super(Tag.RECEIPTED_MESSAGE_ID.code(), value);
 		}
 	}
@@ -798,7 +826,8 @@ public abstract class OptionalParameter {
 			UNKNOWN(4);
 			
 			protected byte value;
-			private Ms_msg_wait_facilities_type(int value) {
+
+			Ms_msg_wait_facilities_type(int value) {
 				this.value = (byte)value;
 			}
 
@@ -846,9 +875,10 @@ public abstract class OptionalParameter {
 		public Ms_msg_wait_facilities_type getMessageType() {
 			return Ms_msg_wait_facilities_type.toEnum((byte)(value & 0x03));
 		}
-		
+
+		@Override
 		public String toString() {
-			String endString = (isIndicatorActive() ? "active" : "inactive");
+			String endString = isIndicatorActive() ? "active" : "inactive";
 			return getMessageType().toString() + " set as " + endString;
 		}
 	}
@@ -1117,7 +1147,8 @@ public abstract class OptionalParameter {
 			RESERVED(255);
 
 			protected byte value;
-			private Language_indicator_enum(int value) {
+
+			Language_indicator_enum(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1297,7 +1328,8 @@ public abstract class OptionalParameter {
 			RESERVED(3);
 			
 			protected byte value;
-			private Presentation_Indicator(int value) {
+
+			Presentation_Indicator(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1333,7 +1365,8 @@ public abstract class OptionalParameter {
 			NETWORK_PROVIDED(3);
 
 			protected byte value;
-			private Screening_Indicator(int value) {
+
+			Screening_Indicator(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1495,7 +1528,7 @@ public abstract class OptionalParameter {
 		}
 		
 		public boolean getDpfResult() {
-			return (value == 1);
+			return value == 1;
 		}
 	}
 	
@@ -1533,7 +1566,7 @@ public abstract class OptionalParameter {
 		}
 		
 		public boolean isDpfSet() {
-			return (value == 1);
+			return value == 1;
 		}
 	}
 	
@@ -1561,7 +1594,8 @@ public abstract class OptionalParameter {
 			RESERVED(3);
 			
 			protected byte value;
-			private Ms_availability_status_enum(int value) {
+
+			Ms_availability_status_enum(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1664,7 +1698,8 @@ public abstract class OptionalParameter {
 			RESERVED(9);
 			
 			protected byte value;
-			private Network_error_code_type(int value) {
+
+			Network_error_code_type(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1715,7 +1750,7 @@ public abstract class OptionalParameter {
 	 */
 	public static class Message_payload extends OptionalParameter.OctetString {
 
-		public Message_payload(byte value[]) {
+		public Message_payload(byte[] value) {
 			super(Tag.MESSAGE_PAYLOAD.code(), value);
 		}
 	}
@@ -1761,7 +1796,8 @@ public abstract class OptionalParameter {
 			RESERVED(4);
 			
 			protected byte value;
-			private Delivery_failure_reason_enum(int value) {
+
+			Delivery_failure_reason_enum(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1824,7 +1860,8 @@ public abstract class OptionalParameter {
 			RESERVED(2);
 			
 			protected byte value;
-			private More_messages_to_send_enum(int value) {
+
+			More_messages_to_send_enum(int value) {
 				this.value = (byte)value;
 			}
 
@@ -1874,6 +1911,7 @@ public abstract class OptionalParameter {
 		 *
 		 */
 		public enum Message_state_enum {
+			SCHEDULED(0),
 			ENROUTE(1),
 			DELIVERED(2),
 			EXPIRED(3),
@@ -1881,11 +1919,12 @@ public abstract class OptionalParameter {
 			UNDELIVERABLE(5),
 			ACCEPTED(6),
 			UNKNOWN(7),
-			REJECTED(8);
+			REJECTED(8),
+			SKIPPED(9);
 			
 			private byte value;
-			
-			private Message_state_enum(int value) {
+
+			Message_state_enum(int value) {
 				this.value = (byte)value;
 			}
 			
@@ -1916,7 +1955,8 @@ public abstract class OptionalParameter {
 		public Message_state_enum getMessageState() {
 			return Message_state_enum.toEnum(value);
 		}
-		
+
+		@Override
 		public String toString() {
 			return getMessageState().toString();
 		}
@@ -1956,10 +1996,9 @@ public abstract class OptionalParameter {
 	 *
 	 */
 	public static class Billing_identification extends OptionalParameter.OctetString {
-		public Billing_identification(byte value[]) {
+		public Billing_identification(byte[] value) {
 			super(Tag.BILLING_IDENTIFICATION.code, value);
 		}
-
 	}
 
 	
@@ -2124,7 +2163,7 @@ public abstract class OptionalParameter {
 	 */
 	public static class Vendor_specific_source_msc_addr extends OptionalParameter.Vendor_specific_msc_addr {
 		
-		public Vendor_specific_source_msc_addr(byte value[]) {
+		public Vendor_specific_source_msc_addr(byte[] value) {
 			super(Tag.VENDOR_SPECIFIC_SOURCE_MSC_ADDR.code, value);
 		}
 	}
@@ -2138,7 +2177,7 @@ public abstract class OptionalParameter {
 	 */
 	public static class Vendor_specific_dest_msc_addr extends OptionalParameter.Vendor_specific_msc_addr {
 		
-		public Vendor_specific_dest_msc_addr(byte value[]) {
+		public Vendor_specific_dest_msc_addr(byte[] value) {
 			super(Tag.VENDOR_SPECIFIC_DEST_MSC_ADDR.code, value);
 		}
 	}
@@ -2146,10 +2185,14 @@ public abstract class OptionalParameter {
 	private static class Vendor_specific_msc_addr extends OptionalParameter.OctetString {
 		String address;
 		
-		private Vendor_specific_msc_addr(short tag, byte value[]) {
+		private Vendor_specific_msc_addr(short tag, byte[] value) {
 			super(tag, value);
 			try {
-				address = new String(value, 2, value.length-2, "ISO-8859-1");
+        if (value.length >= 2) {
+          address = new String(value, 2, value.length - 2, "ISO-8859-1");
+        }
+			} catch (StringIndexOutOfBoundsException e) {
+				e.printStackTrace();
 			} catch (UnsupportedEncodingException e) {
 				// TODO: do something better
 				e.printStackTrace();
@@ -2230,7 +2273,7 @@ public abstract class OptionalParameter {
         private final short code;
         final Class<? extends OptionalParameter> type;
 
-        private Tag(int code, Class<? extends OptionalParameter> type) {
+         Tag(int code, Class<? extends OptionalParameter> type) {
             this.code = (short)code;
             this.type = type;
         }

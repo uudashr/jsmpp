@@ -23,6 +23,12 @@ import java.util.List;
  *
  */
 public final class DataCodings {
+
+    /**
+     * bin: 00010000
+     */
+    public static final byte MASK_CONTAIN_MESSAGE_CLASS = 0x10;
+
     private static final List<DataCodingFactory> factories = new ArrayList<DataCodingFactory>();
     static {
         factories.add(new DataCodingFactory00xx());
@@ -36,8 +42,11 @@ public final class DataCodings {
      * DataCoding with binary value 0000000.
      */
     public static final DataCoding ZERO = new GeneralDataCoding();
-    private static DataCoding[] dataCodingCache = new DataCoding[255];
-    
+
+    private DataCodings() {
+        throw new InstantiationError("This class must not be instantiated");
+    }
+
     /**
      * Create new instance of {@link DataCoding}.
      * 
@@ -51,5 +60,9 @@ public final class DataCodings {
             }
         }
         return new RawDataCoding(dataCoding);
+    }
+
+    public static boolean containsMessageClass(byte dataCoding) {
+        return (dataCoding & MASK_CONTAIN_MESSAGE_CLASS) == MASK_CONTAIN_MESSAGE_CLASS;
     }
 }

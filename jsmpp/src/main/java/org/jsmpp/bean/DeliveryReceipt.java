@@ -26,7 +26,7 @@ import org.jsmpp.util.InvalidDeliveryReceiptException;
  * @author uudashr
  *
  */
-public class DeliveryReceipt {
+public class DeliveryReceipt implements DeliveryReceiptInterface<DeliveryReceiptState> {
     // attributes of delivery receipt
     public static final String DELREC_ID = "id";
     public static final String DELREC_SUB = "sub";
@@ -40,12 +40,11 @@ public class DeliveryReceipt {
     /**
      * Date format for the <b>submit date</b> and <b>done date</b> attribute
      */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "yyMMddHHmm");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmm");
 
     private String id;
-    private int submitted;
-    private int delivered;
+    private Integer submitted;
+    private Integer delivered;
     private Date submitDate;
     private Date doneDate;
     private DeliveryReceiptState finalStatus;
@@ -55,30 +54,27 @@ public class DeliveryReceipt {
     public DeliveryReceipt() {
     }
 
-    public DeliveryReceipt(String formattedDelieryReceipt)
+    public DeliveryReceipt(String formattedDeliveryReceipt)
             throws InvalidDeliveryReceiptException {
         /*
          * id:IIIIIIIIII sub:SSS dlvrd:DDD submit date:YYMMDDhhmm done
          * date:YYMMDDhhmm stat:DDDDDDD err:E Text: ..........
          */
         try {
-            id = getDeliveryReceiptValue(DeliveryReceipt.DELREC_ID, formattedDelieryReceipt);
-            submitted = Integer.parseInt(getDeliveryReceiptValue(
-                    DeliveryReceipt.DELREC_SUB, formattedDelieryReceipt));
-            delivered = Integer.parseInt(getDeliveryReceiptValue(
-                    DeliveryReceipt.DELREC_DLVRD, formattedDelieryReceipt));
+            id = getDeliveryReceiptValue(DeliveryReceipt.DELREC_ID, formattedDeliveryReceipt);
+            submitted = getDeliveryReceiptIntValue(DeliveryReceipt.DELREC_SUB, formattedDeliveryReceipt);
+            delivered = getDeliveryReceiptIntValue(DeliveryReceipt.DELREC_DLVRD, formattedDeliveryReceipt);
             submitDate = string2Date(getDeliveryReceiptValue(
-                    DeliveryReceipt.DELREC_SUBMIT_DATE, formattedDelieryReceipt));
+                    DeliveryReceipt.DELREC_SUBMIT_DATE, formattedDeliveryReceipt));
             doneDate = string2Date(getDeliveryReceiptValue(
-                    DeliveryReceipt.DELREC_DONE_DATE, formattedDelieryReceipt));
+                    DeliveryReceipt.DELREC_DONE_DATE, formattedDeliveryReceipt));
             finalStatus = DeliveryReceiptState
                     .getByName(getDeliveryReceiptValue(
-                            DeliveryReceipt.DELREC_STAT, formattedDelieryReceipt));
-            error = getDeliveryReceiptValue(DeliveryReceipt.DELREC_ERR, formattedDelieryReceipt);
-            text = getDeliveryReceiptTextValue(formattedDelieryReceipt);
+                            DeliveryReceipt.DELREC_STAT, formattedDeliveryReceipt));
+            error = getDeliveryReceiptValue(DeliveryReceipt.DELREC_ERR, formattedDeliveryReceipt);
+            text = getDeliveryReceiptTextValue(formattedDeliveryReceipt);
         } catch (Exception e) {
-            throw new InvalidDeliveryReceiptException(
-                    "There is an error found when parsing delivery receipt", e);
+            throw new InvalidDeliveryReceiptException("There is an error found when parsing delivery receipt", e);
         }
     }
     
@@ -217,28 +213,29 @@ public class DeliveryReceipt {
         }
     }
 
+    @Override
     public String toString() {
         /*
          * id:IIIIIIIIII sub:SSS dlvrd:DDD submit date:YYMMDDhhmm done
          * date:YYMMDDhhmm stat:DDDDDDD err:E Text: . . . . . . . . .
          */
-        StringBuffer sBuf = new StringBuffer(120);
-        sBuf.append(DELREC_ID + ":" + id);
-        sBuf.append(" ");
-        sBuf.append(DELREC_SUB + ":" + intToString(submitted, 3));
-        sBuf.append(" ");
-        sBuf.append(DELREC_DLVRD + ":" + intToString(delivered, 3));
-        sBuf.append(" ");
-        sBuf.append(DELREC_SUBMIT_DATE + ":" + dateFormat.format(submitDate));
-        sBuf.append(" ");
-        sBuf.append(DELREC_DONE_DATE + ":" + dateFormat.format(doneDate));
-        sBuf.append(" ");
-        sBuf.append(DELREC_STAT + ":" + finalStatus);
-        sBuf.append(" ");
-        sBuf.append(DELREC_ERR + ":" + error);
-        sBuf.append(" ");
-        sBuf.append(DELREC_TEXT.toLowerCase() + ":" + text);
-        return sBuf.toString();
+        StringBuilder stringBuilder = new StringBuilder(120);
+        stringBuilder.append(DELREC_ID + ":" + id)
+                     .append(" ")
+                     .append(DELREC_SUB + ":" + intToString(submitted, 3))
+                     .append(" ")
+                     .append(DELREC_DLVRD + ":" + intToString(delivered, 3))
+                     .append(" ")
+                     .append(DELREC_SUBMIT_DATE + ":" + dateFormat.format(submitDate))
+                     .append(" ")
+                     .append(DELREC_DONE_DATE + ":" + dateFormat.format(doneDate))
+                     .append(" ")
+                     .append(DELREC_STAT + ":" + finalStatus)
+                     .append(" ")
+                     .append(DELREC_ERR + ":" + error)
+                     .append(" ")
+                     .append(DELREC_TEXT.toLowerCase() + ":" + text);
+        return stringBuilder.toString();
     }
 
     @Override
@@ -306,12 +303,12 @@ public class DeliveryReceipt {
      * @return the String representation of int value.
      */
     private static String intToString(int value, int digit) {
-        StringBuffer sBuf = new StringBuffer(digit);
-        sBuf.append(Integer.toString(value));
-        while (sBuf.length() < digit) {
-            sBuf.insert(0, "0");
+        StringBuilder stringBuilder = new StringBuilder(digit);
+        stringBuilder.append(Integer.toString(value));
+        while (stringBuilder.length() < digit) {
+            stringBuilder.insert(0, "0");
         }
-        return sBuf.toString();
+        return stringBuilder.toString();
     }
 
     private boolean hasEqualId(DeliveryReceipt other) {
@@ -382,12 +379,14 @@ public class DeliveryReceipt {
             throws IndexOutOfBoundsException {
         String tmpAttr = attrName + ":";
         int startIndex = source.indexOf(tmpAttr);
-        if (startIndex < 0)
+        if (startIndex < 0) {
             return null;
+        }
         startIndex = startIndex + tmpAttr.length();
         int endIndex = source.indexOf(" ", startIndex);
-        if (endIndex > 0)
+        if (endIndex > 0) {
             return source.substring(startIndex, endIndex);
+        }
         return source.substring(startIndex);
     }
     
@@ -411,14 +410,20 @@ public class DeliveryReceipt {
      *         format is less than 10.
      */
     private static Date string2Date(String date) {
-
+        if (date == null) {
+          return null;
+        }
         int year = Integer.parseInt(date.substring(0, 2));
         int month = Integer.parseInt(date.substring(2, 4));
         int day = Integer.parseInt(date.substring(4, 6));
         int hour = Integer.parseInt(date.substring(6, 8));
         int minute = Integer.parseInt(date.substring(8, 10));
+        int second = 0;
+        if (date.length() >= 12){
+            second = Integer.parseInt(date.substring(10, 12));
+        }
         Calendar cal = Calendar.getInstance();
-        cal.set(convertTwoDigitYear(year), month - 1, day, hour, minute, 0);
+        cal.set(convertTwoDigitYear(year), month - 1, day, hour, minute, second);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
@@ -451,5 +456,13 @@ public class DeliveryReceipt {
         }
         startIndex = startIndex + tmpAttr.length();
         return source.substring(startIndex);
+    }
+
+    private static int getDeliveryReceiptIntValue(String attrName, String formattedDeliveryReceipt){
+        String value = getDeliveryReceiptValue(attrName, formattedDeliveryReceipt);
+        if (value != null) {
+            return Integer.parseInt(value);
+        }
+        return -1;
     }
 }

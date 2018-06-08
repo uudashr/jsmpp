@@ -93,10 +93,10 @@ public class PendingResponse<T extends Command> {
     }
 
     /**
-     * Wait until response receive or timeout already reach.
+     * Wait until response received or timeout already reached.
      * 
-     * @throws ResponseTimeoutException if timeout reach.
-     * @throws InvalidResponseException if receive invalid response.
+     * @throws ResponseTimeoutException if timeout reached.
+     * @throws InvalidResponseException if received invalid response.
      */
     public void waitDone() throws ResponseTimeoutException,
             InvalidResponseException {
@@ -106,6 +106,8 @@ public class PendingResponse<T extends Command> {
                 try {
                     condition.await(timeout, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted");
                 }
             }
             

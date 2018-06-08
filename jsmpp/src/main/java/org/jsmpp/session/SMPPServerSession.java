@@ -66,6 +66,9 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class SMPPServerSession extends AbstractSession implements ServerSession {
+    private static final String MESSAGE_RECEIVER_LISTENER_IS_NULL = "Received SubmitMultiSm but MessageReceiverListener is null, returning SMPP error";
+    private static final String NO_MESSAGE_RECEIVER_LISTENER_REGISTERED = "No message receiver listener registered";
+
     private static final Logger logger = LoggerFactory.getLogger(SMPPServerSession.class);
     
     private final Connection conn;
@@ -80,7 +83,7 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
     private ServerMessageReceiverListener messageReceiverListener;
     private ServerResponseDeliveryListener responseDeliveryListener;
     private BindRequestReceiver bindRequestReceiver = new BindRequestReceiver(responseHandler);
-    
+
     public SMPPServerSession(Connection conn,
             SessionStateListener sessionStateListener,
             ServerMessageReceiverListener messageReceiverListener,
@@ -191,7 +194,7 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
             return messageReceiverListener.onAcceptSubmitSm(submitSm, this);
         }
         logger.warn("Received SubmitSm but MessageReceiverListener is null, returning SMPP error");
-        throw new ProcessRequestException("No message receiver listener registered",
+        throw new ProcessRequestException(NO_MESSAGE_RECEIVER_LISTENER_REGISTERED,
                 SMPPConstant.STAT_ESME_RX_R_APPN);
     }
     
@@ -199,8 +202,8 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
         if (messageReceiverListener != null) {
             return messageReceiverListener.onAcceptSubmitMulti(submitMulti, this);
         }
-        logger.warn("Received SubmitMultiSm but MessageReceiverListener is null, returning SMPP error");
-        throw new ProcessRequestException("No message receiver listener registered",
+        logger.warn(MESSAGE_RECEIVER_LISTENER_IS_NULL);
+        throw new ProcessRequestException(NO_MESSAGE_RECEIVER_LISTENER_REGISTERED,
                 SMPPConstant.STAT_ESME_RX_R_APPN);
     }
     
@@ -209,7 +212,7 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
             return messageReceiverListener.onAcceptQuerySm(querySm, this);
         }
         logger.warn("Received SubmitQuerySm but MessageReceiverListener is null, returning SMPP error");
-        throw new ProcessRequestException("No message receiver listener registered", 
+        throw new ProcessRequestException(NO_MESSAGE_RECEIVER_LISTENER_REGISTERED, 
                 SMPPConstant.STAT_ESME_RX_R_APPN);
     }
     
@@ -217,8 +220,8 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
         if (messageReceiverListener != null) {
             messageReceiverListener.onAcceptReplaceSm(replaceSm, this);
         } else {
-            logger.warn("Received SubmitMultiSm but MessageReceiverListener is null, returning SMPP error");
-            throw new ProcessRequestException("No message receiver listener registered",
+            logger.warn(MESSAGE_RECEIVER_LISTENER_IS_NULL);
+            throw new ProcessRequestException(NO_MESSAGE_RECEIVER_LISTENER_REGISTERED,
                     SMPPConstant.STAT_ESME_RX_R_APPN);
         }
     }
@@ -227,8 +230,8 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
         if (messageReceiverListener != null) {
             messageReceiverListener.onAcceptCancelSm(cancelSm, this);
         } else {
-            logger.warn("Received SubmitMultiSm but MessageReceiverListener is null, returning SMPP error");
-            throw new ProcessRequestException("No message receiver listener registered",
+            logger.warn(MESSAGE_RECEIVER_LISTENER_IS_NULL);
+            throw new ProcessRequestException(NO_MESSAGE_RECEIVER_LISTENER_REGISTERED,
                     SMPPConstant.STAT_ESME_RX_R_APPN);
         }
     }
@@ -327,11 +330,11 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
                 // TODO uudashr: we have double checking when accept the bind request
             }
         }
-        
+
         public void processBind(Bind bind) {
-            bindRequestReceiver.notifyAcceptBind(bind);
+            SMPPServerSession.this.bindRequestReceiver.notifyAcceptBind(bind);
         }
-        
+
         public MessageId processSubmitSm(SubmitSm submitSm)
                 throws ProcessRequestException {
             try {
@@ -497,9 +500,10 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
     private class PDUReaderWorker extends Thread {
         private ExecutorService executorService = Executors.newFixedThreadPool(getPduProcessorDegree());
         private Runnable onIOExceptionTask = new Runnable() {
+            @Override
             public void run() {
                 close();
-            };
+            }
         };
         
         @Override
@@ -515,11 +519,8 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
         
         private void readPDU() {
             try {
-                Command pduHeader = null;
-                byte[] pdu = null;
-
-                pduHeader = pduReader.readPDUHeader(in);
-                pdu = pduReader.readPDU(in, pduHeader);
+                Command pduHeader = pduReader.readPDUHeader(in);
+                byte[] pdu = pduReader.readPDU(in, pduHeader);
                 
                 PDUProcessServerTask task = new PDUProcessServerTask(pduHeader,
                         pdu, sessionContext.getStateProcessor(),
@@ -536,7 +537,11 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
             } catch (SocketTimeoutException e) {
                 notifyNoActivity();
             } catch (IOException e) {
+                logger.warn("IOException while reading:", e);
                 close();
+            } catch (RuntimeException e) {
+                logger.warn("RuntimeException:", e);
+                unbindAndClose();
             }
         }
         
@@ -548,7 +553,6 @@ public class SMPPServerSession extends AbstractSession implements ServerSession 
             enquireLinkSender.enquireLink();
         }
     }
-    
     
     private class BoundStateListener implements SessionStateListener {
         public void onStateChange(SessionState newState, SessionState oldState,

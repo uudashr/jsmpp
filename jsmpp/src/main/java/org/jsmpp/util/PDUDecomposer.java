@@ -43,7 +43,7 @@ import org.jsmpp.bean.Unbind;
 import org.jsmpp.bean.UnbindResp;
 
 /**
- * This class is provide interface to decompose SMPP PDU bytes form into SMPP
+ * This class provides an interface to decompose SMPP PDU bytes form into a SMPP
  * command object.
  * 
  * @author uudashr
@@ -167,7 +167,7 @@ public interface PDUDecomposer {
     QuerySm querySm(byte[] b) throws PDUStringException;
 
     /**
-     * Decompose the SMPP PDU query short message reponse command.
+     * Decompose the SMPP PDU query short message response command.
      * 
      * @param b is the PDU.
      * @return the query short message response command object.

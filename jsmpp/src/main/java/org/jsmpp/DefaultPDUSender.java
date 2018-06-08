@@ -110,7 +110,7 @@ public class DefaultPDUSender implements PDUSender {
             int sequenceNumber, String systemId, InterfaceVersion interfaceVersion) throws PDUStringException,
             IOException {
         
-        OptionalParameter p[];
+        OptionalParameter[] p;
         if(interfaceVersion != null) {
             OptionalParameter interfaceVersionParam = new OptionalParameter.Byte(Tag.SC_INTERFACE_VERSION, interfaceVersion.value());
             p = new OptionalParameter[] {interfaceVersionParam};
@@ -119,6 +119,20 @@ public class DefaultPDUSender implements PDUSender {
         }
         
         byte[] b = pduComposer.bindResp(commandId, sequenceNumber, systemId, p);
+        writeAndFlush(os, b);
+        return b;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.jsmpp.PDUSender#sendOutbind(java.io.OutputStream,
+     *      int, java.lang.String, java.lang.String)
+     */
+    public byte[] sendOutbind(OutputStream os, int sequenceNumber, String systemId, String password)
+        throws PDUStringException, IOException
+    {
+        byte[] b = this.pduComposer.outbind( sequenceNumber,systemId, password);
         writeAndFlush(os, b);
         return b;
     }
@@ -297,11 +311,12 @@ public class DefaultPDUSender implements PDUSender {
     /*
      * (non-Javadoc)
      * 
-     * @see org.jsmpp.PDUSender#sendDeliverSmResp(java.io.OutputStream, int)
+     * @see org.jsmpp.PDUSender#sendDeliverSmResp(java.io.OutputStream, int, int, String)
      */
-    public byte[] sendDeliverSmResp(OutputStream os, int commandStatus, int sequenceNumber)
+    @Override
+    public byte[] sendDeliverSmResp(OutputStream os, int commandStatus, int sequenceNumber, String messageId)
             throws IOException {
-        byte[] b = pduComposer.deliverSmResp(commandStatus, sequenceNumber);
+        byte[] b = pduComposer.deliverSmResp(commandStatus, sequenceNumber, messageId);
         writeAndFlush(os, b);
         return b;
     }

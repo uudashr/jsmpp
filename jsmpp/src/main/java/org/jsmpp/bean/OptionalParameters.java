@@ -29,64 +29,69 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class OptionalParameters {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(OptionalParameters.class);
+
+    private OptionalParameters() {
+        throw new InstantiationError("This class must not be instantiated");
+    }
+
     /**
      * Create SAR_MESSAGE_REF_NUM TLV instance.
-     * 
+     *
      * @param value is the value.
      * @return the optional parameter.
      */
     public static OptionalParameter.Short newSarMsgRefNum(short value) {
         return new OptionalParameter.Short(Tag.SAR_MSG_REF_NUM, value);
     }
-    
+
     /**
      * Create SAR_MESSAGE_REF_NUM TLV instance.
      * The value will cast automatically into short type.
-     * 
+     *
      * @param value is the value.
      * @return the optional parameter.
      */
     public static OptionalParameter.Short newSarMsgRefNum(int value) {
         return newSarMsgRefNum((byte)value);
     }
-    
+
     /**
      * Create SAR_SEGMENT_SEQNUM TLV instance.
-     * 
+     *
      * @param value is the value.
      * @return the optional parameter.
      */
     public static OptionalParameter.Byte newSarSegmentSeqnum(byte value) {
         return new OptionalParameter.Byte(Tag.SAR_SEGMENT_SEQNUM, value);
     }
-    
+
     /**
      * Create SAR_SEGMENT_SEQNUM TLV instance.
      * The value will cast automatically into byte type.
-     * 
+     *
      * @param value is the value.
      * @return the optional parameter.
      */
     public static OptionalParameter.Byte newSarSegmentSeqnum(int value) {
         return newSarSegmentSeqnum((byte)value);
     }
-    
+
     /**
      * Create SAR_TOTAL_SEGMENTS TLV instance.
-     * 
+     *
      * @param value is the value.
      * @return the optional parameter.
      */
     public static OptionalParameter.Byte newSarTotalSegments(byte value) {
         return new OptionalParameter.Byte(Tag.SAR_TOTAL_SEGMENTS, value);
     }
-    
+
     /**
      * Create SAR_TOTAL_SEGMENTS TLV instance.
      * The value will cast automatically into byte type.
-     * 
+     *
      * @param value is the value.
      * @return the optional parameter.
      */
@@ -97,18 +102,18 @@ public class OptionalParameters {
     /**
      * Deserialize all recognized tag code to {@link OptionalParameter} object.
      * Unrecognized will be classified as {@link COctetString}.
-     * 
+     *
      * @param tagCode is the tag code.
      * @param content is the content.
      * @return the OptionalParameter object.
      */
     public static OptionalParameter deserialize(short tagCode, byte[] content) {
         Tag tag = Tag.valueOf(tagCode);
-        if(tag == null) {
-            logger.warn("Optional Parameter Tag not recognized for deserialization: " + tagCode);
-            return new COctetString(tagCode, content);
+        if (tag == null) {
+            logger.debug("Optional Parameter Tag not recognized for deserialization: {}", tagCode);
+            return new OctetString(tagCode, content);
         }
-        
+
         switch(tag)
         {
             case DEST_ADDR_SUBUNIT:
@@ -206,11 +211,11 @@ public class OptionalParameters {
             case VENDOR_SPECIFIC_DEST_MSC_ADDR:
                 return new OptionalParameter.Vendor_specific_dest_msc_addr(content);
             default:
-                logger.warn("Missing code in deserialize to handle Optional Parameter Tag: " + tag);
+                logger.warn("Missing code in deserialize to handle Optional Parameter Tag: {}", tag);
         }
 
         // fallback
-        logger.warn("Falling back to basic OptionalParameter types for " + tag);
+        logger.warn("Falling back to basic OptionalParameter types for {}", tag);
         if (Null.class.isAssignableFrom(tag.type)) {
             return new Null(tagCode);
         }
@@ -235,24 +240,27 @@ public class OptionalParameters {
     @SuppressWarnings("unchecked")
     public static <U extends OptionalParameter> U get(Class<U> tagClass, OptionalParameter[] parameters)
     {
-    	if (parameters!=null)
-	        for(OptionalParameter i: parameters) {
-	            if(i.getClass() == tagClass) {
-	                return (U)i;
-	            }
-	        }
-        logger.info("optional tag " + tagClass + " not found");
+        if (parameters != null) {
+          for (OptionalParameter i : parameters) {
+            if (i.getClass() == tagClass) {
+              return (U) i;
+            }
+          }
+        }
+        logger.info("Optional Parameter Tag {} not found", tagClass);
         return null;
     }
 
     public static OptionalParameter get(short tag, OptionalParameter[] parameters)
     {
-        for(OptionalParameter i: parameters) {
-            if(i.tag == tag) {
-                return i;
+        if (parameters != null) {
+          for (OptionalParameter i : parameters) {
+            if (i.tag == tag) {
+              return i;
             }
+          }
         }
-        logger.info("optional tag " + tag + " not found");
+        logger.info("Optional Parameter Tag {} not found", tag);
         return null;
     }
 }

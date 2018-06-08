@@ -31,8 +31,8 @@ import org.jsmpp.bean.TypeOfNumber;
 import org.jsmpp.bean.UnsuccessDelivery;
 
 /**
- * This class provide way to send SMPP Command over an {@link OutputStream}.
- * PDU will be created and returned as bytes.
+ * This class provides a way to send SMPP Commands over an {@link OutputStream}.
+ * PDUs will be created and returned as bytes.
  * 
  * @author uudashr
  * @version 1.0
@@ -90,6 +90,21 @@ public interface PDUSender {
      */
     byte[] sendBindResp(OutputStream os, int commandId, int sequenceNumber,
             String systemId, InterfaceVersion interfaceVersion) throws PDUStringException, IOException;
+
+    /**
+     * Send outbind command.
+     *
+     * @param os is the {@link OutputStream}
+     * @param sequenceNumber is the sequence_number.
+     * @param systemId is the system_id.
+     * @param password is the password.
+     * @return the composed bytes.
+     * @throws PDUStringException if there is an invalid string constraint found.
+     * @throws IOException if an I/O error occur.
+     */
+    byte[] sendOutbind(OutputStream os,int sequenceNumber,
+                       String systemId, String password)
+        throws PDUStringException, IOException;
 
     /**
      * Send unbind command.
@@ -277,7 +292,7 @@ public interface PDUSender {
      * @return the composed bytes.
      * @throws IOException if there is an IO error occur.
      */
-    byte[] sendDeliverSmResp(OutputStream os, int commandStatus, int sequenceNumber)
+    byte[] sendDeliverSmResp(OutputStream os, int commandStatus, int sequenceNumber, String messageId)
             throws IOException;
 
     /**
