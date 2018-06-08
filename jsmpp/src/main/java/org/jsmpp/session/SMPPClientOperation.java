@@ -18,7 +18,6 @@ import java.io.IOException;
 
 import org.jsmpp.InvalidResponseException;
 import org.jsmpp.PDUException;
-import org.jsmpp.PDUStringException;
 import org.jsmpp.bean.Address;
 import org.jsmpp.bean.BindType;
 import org.jsmpp.bean.DataCoding;
@@ -88,5 +87,6 @@ public interface SMPPClientOperation extends SMPPOperation {
             byte[] shortMessage) throws PDUException, ResponseTimeoutException,
             InvalidResponseException, NegativeResponseException, IOException;
 
-    void deliverSmResp(int sequenceNumber) throws IOException;
+    void deliverSmResp(int sequenceNumber, String messageId) throws IOException;
+
 }

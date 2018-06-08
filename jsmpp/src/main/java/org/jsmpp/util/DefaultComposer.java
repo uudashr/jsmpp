@@ -332,15 +332,11 @@ public class DefaultComposer implements PDUComposer {
         buf.append(esmClass);
         buf.append(protocolId);
         buf.append(priorityFlag);
-        // buf.append(scheduleDeliveryTime);
         buf.append((String)null); // schedule delivery time
-        // buf.append(validityPeriod);
         buf.append((String)null); // validity period
         buf.append(registeredDelivery);
-        // buf.append(replaceIfPresent);
         buf.append((byte)0); // replace if present flag
         buf.append(dataCoding);
-        // buf.append(smDefaultMsgId);
         buf.append((byte)0); // sm default msg id
         buf.append((byte)shortMessage.length);
         buf.append(shortMessage);
@@ -352,12 +348,13 @@ public class DefaultComposer implements PDUComposer {
     /*
      * (non-Javadoc)
      * 
-     * @see org.jsmpp.util.PDUComposer#deliverSmResp(int)
+     * @see org.jsmpp.util.PDUComposer#deliverSmResp(int, int, String)
      */
-    public byte[] deliverSmResp(int commandStatus, int sequenceNumber) {
+    @Override
+    public byte[] deliverSmResp(int commandStatus, int sequenceNumber, String messageId) {
         PDUByteBuffer buf = new PDUByteBuffer(SMPPConstant.CID_DELIVER_SM_RESP,
-        		commandStatus, sequenceNumber);
-        buf.append((String)null);
+                commandStatus, sequenceNumber);
+        buf.append(messageId);
         return buf.toBytes();
     }
 
@@ -440,9 +437,8 @@ public class DefaultComposer implements PDUComposer {
     }
 
     public byte[] cancelSmResp(int sequenceNumber) {
-        byte[] b = composeHeader(SMPPConstant.CID_CANCEL_SM_RESP,
+        return composeHeader(SMPPConstant.CID_CANCEL_SM_RESP,
                 SMPPConstant.STAT_ESME_ROK, sequenceNumber);
-        return b;
     }
 
     public byte[] replaceSm(int sequenceNumber, String messageId,

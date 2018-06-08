@@ -20,7 +20,7 @@ import java.util.Date;
 
 
 /**
- * Absolute time formatter is {@link TimeFormatter} implementation referred to
+ * Absolute time formatter is a {@link TimeFormatter} implementation referred to in
  * SMPP Protocol Specification v3.4 point 7.1.1.
  * 
  * @author uudashr
@@ -50,14 +50,14 @@ public class AbsoluteTimeFormatter implements TimeFormatter {
         
         // Get the sign
         char sign;
-        if (offset > 0) {
+        if (offset >= 0) {
             sign = '+';
         } else {
             sign = '-';
         }
         
         // Time difference in quarter hours
-        int timeDiff = (int)(Math.abs(offset) / (15 * 60 * 1000));
+        int timeDiff = Math.abs(offset) / (15 * 60 * 1000);
         
         return format(year, month, day, hour, minute, second, tenthsOfSecond, timeDiff, sign);
     }

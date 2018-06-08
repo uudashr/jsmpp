@@ -47,18 +47,18 @@ class SMPPSessionOpen implements SMPPSessionState {
     public SessionState getSessionState() {
         return SessionState.OPEN;
     }
-    
+
     public void processBindResp(Command pduHeader, byte[] pdu,
             ResponseHandler responseHandler) throws IOException {
         PendingResponse<Command> pendingResp = responseHandler
                 .removeSentItem(pduHeader.getSequenceNumber());
         if (pendingResp != null) {
             try {
-                logger.debug("Bind Response header ("
-                        + pduHeader.getCommandLength() + ", "
-                        + pduHeader.getCommandIdAsHex() + ", "
-                        + IntUtil.toHexString(pduHeader.getCommandStatus())
-                        + ", " + pduHeader.getSequenceNumber() + ")");
+                logger.debug("Bind Response header ({}, {}, {}, {})",new Object[] {
+                    pduHeader.getCommandLength(),
+                    pduHeader.getCommandIdAsHex(),
+                    IntUtil.toHexString(pduHeader.getCommandStatus()),
+                    pduHeader.getSequenceNumber()});
                 BindResp resp = pduDecomposer.bindResp(pdu);
                 pendingResp.done(resp);
             } catch (PDUStringException e) {
@@ -71,11 +71,10 @@ class SMPPSessionOpen implements SMPPSessionState {
                                 message, e));
             }
         } else {
-            logger.error("No request with sequence number "
-                    + pduHeader.getSequenceNumber() + " found");
+            logger.error("No request with sequence number {} found", pduHeader.getSequenceNumber() );
             responseHandler.sendGenerickNack(
-                    SMPPConstant.STAT_ESME_RINVDFTMSGID, pduHeader
-                            .getSequenceNumber());
+                SMPPConstant.STAT_ESME_RINVDFTMSGID, pduHeader
+                    .getSequenceNumber());
         }
     }
 

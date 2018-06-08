@@ -22,14 +22,14 @@ package org.jsmpp.bean;
 public interface DataCodingFactory {
 
     /**
-     * @param dataCoding
-     * @return
+     * @param dataCoding The data coding scheme
+     * @return <tt>true</tt> if dataCoding is recognized
      */
     boolean isRecognized(byte dataCoding);
     
     /**
-     * @param dataCoding
-     * @return
+     * @param dataCoding The data coding scheme
+     * @return new DataCoding object
      */
     DataCoding newInstance(byte dataCoding);
 

@@ -29,10 +29,10 @@ public class SimpleDataCoding implements DataCoding {
 
     /**
      * Construct Data Coding using default Alphabet and
-     * {@link MessageClass#CLASS0} Message Class.
+     * {@link MessageClass#CLASS1} Message Class.
      */
     public SimpleDataCoding() {
-        this(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS0);
+        this(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS1);
     }
 
     /**
@@ -49,18 +49,18 @@ public class SimpleDataCoding implements DataCoding {
     public SimpleDataCoding(Alphabet alphabet, MessageClass messageClass) throws IllegalArgumentException {
         if (alphabet == null) {
             throw new IllegalArgumentException(
-                    "alphabet is mandatory, can't be null");
+                    "Alphabet is mandatory, can't be null");
         }
         if (alphabet.equals(Alphabet.ALPHA_UCS2)
-                || alphabet.equals(Alphabet.ALPHA_RESERVED)) {
+                || alphabet.isReserved()) {
             throw new IllegalArgumentException(
-                    "Supported alphabet for SimpleDataCoding is "
-                            + Alphabet.ALPHA_DEFAULT + " or "
-                            + Alphabet.ALPHA_8_BIT + " only. Current alphabet is " + alphabet);
+                    "Supported alphabet for SimpleDataCoding does not include "
+                            + Alphabet.ALPHA_UCS2 + " or "
+                            + "reserved alphabet codes. Current alphabet is " + alphabet);
         }
         if (messageClass == null) {
             throw new IllegalArgumentException(
-                    "messageClass is mandatory, can't be null");
+                    "MessageClass is mandatory, can't be null");
         }
         this.alphabet = alphabet;
         this.messageClass = messageClass;

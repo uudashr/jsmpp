@@ -19,7 +19,6 @@ import java.io.IOException;
 import org.jsmpp.InvalidResponseException;
 import org.jsmpp.PDUException;
 import org.jsmpp.PDUSender;
-import org.jsmpp.PDUStringException;
 import org.jsmpp.bean.Address;
 import org.jsmpp.bean.BindResp;
 import org.jsmpp.bean.BindType;
@@ -166,8 +165,11 @@ public class DefaultSMPPClientOperation extends AbstractSMPPOperation implements
         executeSendCommand(replaceSmTask, getTransactionTimer());
     }
 
-    public void deliverSmResp(int sequenceNumber) throws IOException {
+    @Override
+    public void deliverSmResp(int sequenceNumber, String messageId) throws IOException {
         pduSender().sendDeliverSmResp(connection().getOutputStream(),
-                0, sequenceNumber);
+                0, sequenceNumber, messageId);
+
     }
+
 }
